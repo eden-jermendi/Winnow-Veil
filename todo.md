@@ -12,6 +12,12 @@
 - [x] Add file size guardrails (500KB).
 - [x] Implement safe regex scanning logic via `scanSourceFile`.
 
+## Technical Fixes & Refactoring (COMPLETE)
+- [x] Fix TypeScript `node:` prefix resolution.
+- [x] Add stream error handling in `file-io.ts`.
+- [x] Implement Heuristic Registry Pattern.
+- [x] Decouple heuristics from parsers.
+
 ## Phase 3 — Scanning Engine (Core Logic)
 - [ ] Implement core scanning engine.
 - [ ] Integrate heuristics engine.
