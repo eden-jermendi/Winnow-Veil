@@ -8,6 +8,7 @@ import { registry } from '../heuristics/registry.js';
 import { printConsoleReport } from '../reporter/console.js';
 import { HeuristicSeverity } from '../heuristics/types.js';
 import { execSync } from 'node:child_process';
+import path from 'node:path';
 
 async function main() {
   const args = process.argv.slice(2);
@@ -82,15 +83,20 @@ async function handleHook() {
   try {
     const stagedFiles = execSync('git diff --staged --name-only', { encoding: 'utf-8' });
     const manifests = ['package.json', 'package-lock.json', 'yarn.lock', 'pnpm-lock.yaml'];
-    const hasManifestChanges = stagedFiles.split('\n').some(file => manifests.includes(file.trim()));
+    
+    const hasManifestChanges = stagedFiles.split('\n').some(file => {
+      const fileName = path.basename(file.trim());
+      return manifests.includes(fileName);
+    });
 
     if (!hasManifestChanges) {
-      // Exit silent and fast
+      console.log('ℹ️  SafeDep: No dependency manifest changes detected. Skipping scan.');
       process.exit(0);
     }
+
+    console.log('🔍 SafeDep: Staged manifest changes detected. Initializing hook gatekeeper scan...');
   } catch (err) {
-    // If git fails, we fail-open for the developer
-    process.exit(0);
+    console.warn('⚠️  SafeDep: Failed to read Git diff status. Defaulting to full scan safety protocol.');
   }
 
   // 2. Timeout Guardrail: 1.5s limit
