@@ -7,6 +7,7 @@ import { HeuristicMatch } from '../heuristics/types.js';
 
 export interface ScanOptions {
   includeDevDeps?: boolean;
+  allowedPackages?: string[];
 }
 
 export interface ScanResult {
@@ -22,7 +23,10 @@ export interface ScanReport {
   findings: ScanResult[];
 }
 
+const DEFAULT_ALLOWED_PACKAGES = ['husky', 'typescript', '@types/node'];
+
 export async function runScanner(rootDir: string, options: ScanOptions = {}): Promise<ScanReport> {
+  const allowedPackages = options.allowedPackages || DEFAULT_ALLOWED_PACKAGES;
   const rootManifestPath = path.join(rootDir, 'package.json');
   const rootManifest = await parsePackageManifest(rootManifestPath);
 
@@ -39,6 +43,12 @@ export async function runScanner(rootDir: string, options: ScanOptions = {}): Pr
   const depNames = Object.keys(dependencies);
 
   for (const depName of depNames) {
+    if (allowedPackages.includes(depName)) {
+      // Subtle informational diagnostic for allowed packages
+      console.log(`ℹ️  SafeDep: Skipping allowed package: ${depName}`);
+      continue;
+    }
+
     const depPath = path.join(rootDir, 'node_modules', depName);
     const depManifestPath = path.join(depPath, 'package.json');
     const depManifest = await parsePackageManifest(depManifestPath);
