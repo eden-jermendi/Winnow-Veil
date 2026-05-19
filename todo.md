@@ -25,6 +25,12 @@
 - [x] Implement MVP Rules: Lifecycle Scripts & Sensitive APIs.
 - [x] Direct dependency targeting (no recursive walk).
 
+## Intermediary Verification (COMPLETE)
+- [x] Refine Heuristic Regex (Word boundaries).
+- [x] Enhance match reporting (Line numbers & content).
+- [x] Implement Native Test Harness (`node:test`).
+- [x] Verify orchestrator with mock workspace.
+
 ## Phase 4 — CLI Entry Point
 - [ ] Implement `scan` and `explain` commands.
 - [ ] Output structured risk report.
