@@ -42,3 +42,8 @@
 - [x] Lightweight delta check (Skip if no manifest changes).
 - [x] Strict 1.5s timeout guardrail (Fail-open).
 - [x] Husky integration instructions (`HUSKY.md`).
+
+## Hook Diagnostic Sprint (COMPLETE)
+- [x] Add explicit lifecycle logs to hook mode.
+- [x] Refine manifest delta matching logic.
+- [x] Improve error reporting for Git failures.
