@@ -31,10 +31,11 @@
 - [x] Implement Native Test Harness (`node:test`).
 - [x] Verify orchestrator with mock workspace.
 
-## Phase 4 — CLI Entry Point
-- [ ] Implement `scan` and `explain` commands.
-- [ ] Output structured risk report.
-- [ ] Ensure clean exit codes for Git hooks.
+## Phase 4 — CLI Entry Point (COMPLETE)
+- [x] Implement `scan` and `explain` commands.
+- [x] Output structured risk report (Human-scannable).
+- [x] Ensure clean exit codes for Git hooks (1 for CRITICAL).
+- [x] Manual `process.argv` parsing (Zero dependencies).
 
 ## Phase 5 — Git Hook Integration
 - [ ] Provide Husky integration instructions.
