@@ -2,7 +2,7 @@
   "name": "safedep",
   "version": "0.1.0",
   "type": "module",
-  "description": "Lightweight dependency risk scannerrrr",
+  "description": "Lightweight dependency risk scanner",
   "main": "dist/src/index.js",
   "bin": {
     "safedep": "dist/src/cli/index.js"
