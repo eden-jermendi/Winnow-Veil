@@ -7,6 +7,7 @@ import { runScanner } from '../core/engine.js';
 import { registry } from '../heuristics/registry.js';
 import { printConsoleReport } from '../reporter/console.js';
 import { HeuristicSeverity } from '../heuristics/types.js';
+import { execSync } from 'node:child_process';
 
 async function main() {
   const args = process.argv.slice(2);
@@ -25,7 +26,7 @@ async function main() {
       handleExplain(args.slice(1));
       break;
     case 'hook':
-      console.log('Hook command implementation pending Phase 5.');
+      await handleHook();
       break;
     default:
       console.error(`Unknown command: ${command}`);
@@ -73,6 +74,59 @@ async function handleScan(options: string[]) {
   } catch (err: any) {
     console.error(`Scan failed: ${err.message}`);
     process.exit(1);
+  }
+}
+
+async function handleHook() {
+  // 1. Delta Check: Check if manifests changed in staged changes
+  try {
+    const stagedFiles = execSync('git diff --staged --name-only', { encoding: 'utf-8' });
+    const manifests = ['package.json', 'package-lock.json', 'yarn.lock', 'pnpm-lock.yaml'];
+    const hasManifestChanges = stagedFiles.split('\n').some(file => manifests.includes(file.trim()));
+
+    if (!hasManifestChanges) {
+      // Exit silent and fast
+      process.exit(0);
+    }
+  } catch (err) {
+    // If git fails, we fail-open for the developer
+    process.exit(0);
+  }
+
+  // 2. Timeout Guardrail: 1.5s limit
+  const HOOK_TIMEOUT_MS = 1500;
+  
+  const timeoutPromise = new Promise((_, reject) => {
+    setTimeout(() => reject(new Error('TIMEOUT')), HOOK_TIMEOUT_MS);
+  });
+
+  const scanPromise = (async () => {
+    const startTime = performance.now();
+    const report = await runScanner(process.cwd(), { includeDevDeps: false });
+    const endTime = performance.now();
+    return { report, duration: endTime - startTime };
+  })();
+
+  try {
+    const { report, duration } = await Promise.race([scanPromise, timeoutPromise]) as { report: any, duration: number };
+    
+    const criticalFindings = report.findings.filter((f: any) => 
+      f.matches.some((m: any) => m.severity === HeuristicSeverity.CRITICAL)
+    );
+
+    if (criticalFindings.length > 0) {
+      console.warn('\n⚠️  SafeDep: Critical dependency risks detected in manifest change!');
+      printConsoleReport({ ...report, findings: criticalFindings }, duration);
+      process.exit(1);
+    }
+    
+    process.exit(0);
+  } catch (err: any) {
+    if (err.message === 'TIMEOUT') {
+      console.warn('\n⚡ SafeDep: Scan timed out (>1.5s). Bypassing to avoid workflow block.');
+    }
+    // Fail-open for timeout or internal scanner errors during hook
+    process.exit(0);
   }
 }
 

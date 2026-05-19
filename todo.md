@@ -37,6 +37,8 @@
 - [x] Ensure clean exit codes for Git hooks (1 for CRITICAL).
 - [x] Manual `process.argv` parsing (Zero dependencies).
 
-## Phase 5 — Git Hook Integration
-- [ ] Provide Husky integration instructions.
-- [ ] Setup pre-commit/pre-push blocking behavior.
+## Phase 5 — Git Hook Integration (COMPLETE)
+- [x] Implement Hook Command Mode (`safedep hook`).
+- [x] Lightweight delta check (Skip if no manifest changes).
+- [x] Strict 1.5s timeout guardrail (Fail-open).
+- [x] Husky integration instructions (`HUSKY.md`).
