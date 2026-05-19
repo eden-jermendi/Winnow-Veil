@@ -42,6 +42,8 @@
 - [x] Lightweight delta check (Skip if no manifest changes).
 - [x] Strict 1.5s timeout guardrail (Fail-open).
 - [x] Husky integration instructions (`HUSKY.md`).
+- [x] Automated installation script (`scripts/setup-hook.ts`).
+- [x] NPM shortcut (`npm run setup-hook`) for seamless wiring.
 
 ## Hook Diagnostic Sprint (COMPLETE)
 - [x] Add explicit lifecycle logs to hook mode.

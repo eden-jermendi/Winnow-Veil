@@ -11,10 +11,14 @@
     "build": "tsc",
     "start": "node dist/src/cli/index.js",
     "dev": "tsc -w",
-    "test": "npm run build && node --test dist/tests/engine.test.js"
+    "test": "npm run build && node --test dist/tests/engine.test.js",
+    "setup-hook": "npx tsx scripts/setup-hook.ts",
+    "prepare": "husky"
   },
   "devDependencies": {
-    "typescript": "^5.0.0",
-    "@types/node": "^20.0.0"
+    "@types/node": "^20.0.0",
+    "husky": "^9.1.7",
+    "tsx": "^4.22.2",
+    "typescript": "^5.0.0"
   }
 }
