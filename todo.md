@@ -18,10 +18,12 @@
 - [x] Implement Heuristic Registry Pattern.
 - [x] Decouple heuristics from parsers.
 
-## Phase 3 — Scanning Engine (Core Logic)
-- [ ] Implement core scanning engine.
-- [ ] Integrate heuristics engine.
-- [ ] Implement risk scoring model.
+## Phase 3 — Scanning Engine (Core Logic) (COMPLETE)
+- [x] Implement core scanning engine orchestrator.
+- [x] Integrate heuristics engine.
+- [x] Implement risk scoring model (matches aggregated in findings).
+- [x] Implement MVP Rules: Lifecycle Scripts & Sensitive APIs.
+- [x] Direct dependency targeting (no recursive walk).
 
 ## Phase 4 — CLI Entry Point
 - [ ] Implement `scan` and `explain` commands.
