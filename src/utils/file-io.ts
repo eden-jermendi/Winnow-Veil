@@ -48,14 +48,22 @@ export async function scanFileLines(
     crlfDelay: Infinity,
   });
 
-  let lineCount = 0;
-  for await (const line of rl) {
-    lineCount++;
-    if (onLine(line, lineCount) === true) {
-      break;
-    }
-  }
+  return new Promise((resolve, reject) => {
+    let lineCount = 0;
 
-  rl.close();
-  fileStream.destroy();
+    fileStream.on('error', reject);
+    rl.on('error', reject);
+
+    rl.on('line', (line) => {
+      lineCount++;
+      if (onLine(line, lineCount) === true) {
+        rl.close();
+      }
+    });
+
+    rl.on('close', () => {
+      fileStream.destroy();
+      resolve();
+    });
+  });
 }
