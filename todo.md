@@ -7,10 +7,10 @@
 - [x] Establish CLI entry point (scaffold only).
 - [ ] Verify project can compile with `tsc`.
 
-## Phase 2 — Memory-Safe File Parser Utility
-- [ ] Implement streaming/chunked file reading.
-- [ ] Add file size guardrails.
-- [ ] Implement safe regex scanning logic.
+## Phase 2 — Memory-Safe File Parser Utility (COMPLETE)
+- [x] Implement streaming/chunked file reading (using `readline` + `fs.createReadStream`).
+- [x] Add file size guardrails (500KB).
+- [x] Implement safe regex scanning logic via `scanSourceFile`.
 
 ## Phase 3 — Scanning Engine (Core Logic)
 - [ ] Implement core scanning engine.
