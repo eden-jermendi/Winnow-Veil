@@ -1,7 +1,14 @@
 import { HeuristicRule } from './types.js';
+import { LifecycleScriptsRule } from './manifest/lifecycle-scripts.js';
+import { SensitiveAPIsRule } from './source/sensitive-apis.js';
 
 export class HeuristicRegistry {
   private rules: Map<string, HeuristicRule> = new Map();
+
+  constructor() {
+    this.register(LifecycleScriptsRule);
+    this.register(SensitiveAPIsRule);
+  }
 
   register(rule: HeuristicRule): void {
     if (this.rules.has(rule.id)) {
