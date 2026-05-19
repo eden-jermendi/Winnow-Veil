@@ -6,10 +6,10 @@ export const SensitiveAPIsRule: HeuristicRule = {
   description: 'Flags usage of eval() or child_process which are common vectors for code injection.',
   
   validateLine(line: string): string | null {
-    if (/eval\s*\(/.test(line)) {
+    if (/\beval\s*\(/.test(line)) {
       return 'Usage of eval() detected.';
     }
-    if (/child_process/.test(line) || /exec\s*\(/.test(line) || /spawn\s*\(/.test(line)) {
+    if (/\bchild_process\b/.test(line) || /\bexec\s*\(/.test(line) || /\bspawn\s*\(/.test(line)) {
       return 'Usage of child_process or execution command detected.';
     }
     return null;
