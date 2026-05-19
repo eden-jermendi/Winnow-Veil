@@ -65,3 +65,8 @@
 - [x] Set up headless cloud runner (`ubuntu-latest`, Node.js LTS, `npm ci`).
 - [x] Execute full baseline enforcement scan (`scan --include-dev`).
 - [x] Verify non-zero exit codes block broken Pull Requests on GitHub.
+
+## Phase 7 — Real-World Testing & Refinement (TODO)
+
+- [ ] Gather enough testing data from personal use.
+- [ ] Update SafeDep based on the personal testing data.
