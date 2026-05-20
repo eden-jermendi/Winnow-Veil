@@ -70,3 +70,7 @@
 
 - [ ] Gather enough testing data from personal use.
 - [ ] Update SafeDep based on the personal testing data.
+
+## Phase 8 — Cohort Readiness & Configuration (TODO)
+
+- [ ] Externalize the Overrides: Move the hardcoded allowlist into a configurable safedep.json file so other developers can trust/bypass their own specific packages.

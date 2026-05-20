@@ -9,7 +9,7 @@ export const SensitiveAPIsRule: HeuristicRule = {
     if (/\beval\s*\(/.test(line)) {
       return 'Usage of eval() detected.';
     }
-    if (/\bchild_process\b/.test(line) || /\bexec\s*\(/.test(line) || /\bspawn\s*\(/.test(line)) {
+    if (/\bchild_process\b/.test(line) || /(?:^|[^.])\b(exec|spawn|fork)\s*\(/.test(line)) {
       return 'Usage of child_process or execution command detected.';
     }
     return null;

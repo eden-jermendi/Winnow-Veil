@@ -4,6 +4,7 @@ import { parsePackageManifest } from '../parsers/package.js';
 import { scanSourceFile } from '../parsers/source.js';
 import { registry } from '../heuristics/registry.js';
 import { HeuristicMatch } from '../heuristics/types.js';
+import { loadConfig } from '../config/loader.js';
 
 export interface ScanOptions {
   includeDevDeps?: boolean;
@@ -26,7 +27,12 @@ export interface ScanReport {
 const DEFAULT_ALLOWED_PACKAGES = ['husky', 'typescript', '@types/node'];
 
 export async function runScanner(rootDir: string, options: ScanOptions = {}): Promise<ScanReport> {
-  const allowedPackages = options.allowedPackages || DEFAULT_ALLOWED_PACKAGES;
+  const config = loadConfig(rootDir);
+  const allowedPackages = [
+    ...DEFAULT_ALLOWED_PACKAGES,
+    ...(config.allowlist || []),
+    ...(options.allowedPackages || [])
+  ];
   const rootManifestPath = path.join(rootDir, 'package.json');
   const rootManifest = await parsePackageManifest(rootManifestPath);
 
