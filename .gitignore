@@ -2,3 +2,4 @@ node_modules/
 dist/
 .safedep-cache.json
 promptkit
+.antigravitycli
