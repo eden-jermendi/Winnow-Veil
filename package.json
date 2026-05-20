@@ -8,7 +8,7 @@
     "safedep": "dist/src/cli/index.js"
   },
   "scripts": {
-    "build": "tsc",
+    "build": "tsc && chmod +x dist/src/cli/index.js",
     "start": "node dist/src/cli/index.js",
     "dev": "tsc -w",
     "test": "npm run build && node --test dist/tests/engine.test.js",
