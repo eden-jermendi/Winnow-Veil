@@ -1,5 +1,9 @@
 # SafeDep Development Progress
 
+## Important Guardrails!
+
+- Never delete or move the #!/usr/bin/env node shebang from the absolute top of src/cli/index.ts
+
 ## Phase 1 — Project Initialization (COMPLETE)
 
 - [x] Initialize `package.json` with minimal dependencies (manual argv parsing).
