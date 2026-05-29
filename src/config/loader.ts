@@ -1,10 +1,10 @@
 import fs from 'node:fs';
 import path from 'node:path';
-import { SafeDepConfig } from './types.js';
+import { VeilConfig } from './types.js';
 
-const CONFIG_FILE = 'safedep.json';
+const CONFIG_FILE = 'veil.json';
 
-export function loadConfig(projectRoot: string): SafeDepConfig {
+export function loadConfig(projectRoot: string): VeilConfig {
   const configPath = path.join(projectRoot, CONFIG_FILE);
   
   if (!fs.existsSync(configPath)) {
@@ -13,9 +13,8 @@ export function loadConfig(projectRoot: string): SafeDepConfig {
 
   try {
     const content = fs.readFileSync(configPath, 'utf-8');
-    return JSON.parse(content) as SafeDepConfig;
+    return JSON.parse(content) as VeilConfig;
   } catch (error) {
-    console.error(`[SafeDep] Error: Failed to parse ${CONFIG_FILE}. Ensure it is valid JSON.`);
-    process.exit(1);
+    throw new Error(`Failed to parse ${CONFIG_FILE}. Ensure it is valid JSON.`);
   }
 }

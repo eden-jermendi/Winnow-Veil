@@ -1,11 +1,11 @@
 import { ScanReport } from '../core/engine.js';
-import { HeuristicSeverity } from '../heuristics/types.js';
+import { HeuristicSeverity } from '../rules/types.js';
 
 /**
  * Formats and prints the scan report to the console.
  */
 export function printConsoleReport(report: ScanReport, durationMs: number): void {
-  console.log(`\n=== SafeDep Scan Report ===`);
+  console.log(`\n=== Veil Scan Report ===`);
   console.log(`Directory: ${report.rootDir}`);
   console.log(`Timestamp: ${report.timestamp}\n`);
 

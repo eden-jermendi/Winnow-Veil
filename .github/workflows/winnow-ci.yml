@@ -1,4 +1,4 @@
-name: SafeDep CI Enforcement
+name: WinnowCI Enforcement
 
 on:
   push:
@@ -7,8 +7,8 @@ on:
     branches: [ main ]
 
 jobs:
-  scan:
-    name: Dependency Risk Scan
+  security-scan:
+    name: Dependency Risk Inspection
     runs-on: ubuntu-latest
 
     steps:
@@ -24,14 +24,10 @@ jobs:
       - name: Install Dependencies
         run: npm ci
 
-      - name: Build Project
-        run: npm run build
-
-      - name: Run SafeDep Scan
-        # Enforce full baseline scan including devDependencies.
-        # This will exit with code 1 if CRITICAL risks are found, failing the job.
-        run: npx tsx src/cli/index.ts scan --include-dev
+      - name: Run Winnow Security Scanner (Local Action)
+        uses: ./ci
+        with:
+          include-dev: true
 
       - name: Run Engine Tests
-        # Ensure core logic remains sound in the CI environment.
         run: npm test

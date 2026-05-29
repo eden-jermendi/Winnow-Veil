@@ -3,12 +3,12 @@ import fs from 'node:fs';
 import path from 'node:path';
 
 /**
- * SafeDep Husky Setup Script
+ * Veil Husky Setup Script
  * Automates the installation and configuration of the pre-commit hook.
  */
 
 function setup() {
-  console.log('🚀 Initializing SafeDep Git Hook (Husky)...');
+  console.log('🚀 Initializing Veil Git Hook (Husky)...');
 
   try {
     // 1. Initialize Husky
@@ -29,7 +29,7 @@ function setup() {
 
     fs.writeFileSync(preCommitPath, `#!/usr/bin/env sh\n${hookCommand}\n`, { mode: 0o755 });
 
-    console.log('✅ SafeDep pre-commit hook installed successfully!');
+    console.log('✅ Veil pre-commit hook installed successfully!');
     console.log('ℹ️  The hook will now run automatically on every "git commit".');
   } catch (error) {
     console.error('❌ Failed to setup Husky hook:', error);

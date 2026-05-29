@@ -16,6 +16,8 @@ export interface HeuristicRule {
   id: string;
   severity: HeuristicSeverity;
   description: string;
+  explanation?: string[];
+  remediation?: string[];
   
   /**
    * For source file scanning (line-by-line).

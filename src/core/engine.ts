@@ -1,9 +1,9 @@
 import path from 'node:path';
 import fs from 'node:fs/promises';
-import { parsePackageManifest } from '../parsers/package.js';
-import { scanSourceFile } from '../parsers/source.js';
-import { registry } from '../heuristics/registry.js';
-import { HeuristicMatch } from '../heuristics/types.js';
+import { parsePackageManifest } from './parsers/package.js';
+import { scanSourceFile } from './parsers/source.js';
+import { registry } from '../rules/registry.js';
+import { HeuristicMatch } from '../rules/types.js';
 import { loadConfig } from '../config/loader.js';
 
 export interface ScanOptions {
@@ -50,8 +50,6 @@ export async function runScanner(rootDir: string, options: ScanOptions = {}): Pr
 
   for (const depName of depNames) {
     if (allowedPackages.includes(depName)) {
-      // Subtle informational diagnostic for allowed packages
-      console.log(`ℹ️  SafeDep: Skipping allowed package: ${depName}`);
       continue;
     }
 

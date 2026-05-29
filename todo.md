@@ -1,80 +1,67 @@
-# SafeDep Development Progress
+# Veil & Winnow Development Progress
 
 ## Important Guardrails!
 
-- Never delete or move the #!/usr/bin/env node shebang from the absolute top of src/cli/index.ts
+- Never delete or move the `#!/usr/bin/env node` shebang from the absolute top of `src/cli/index.ts`.
+- Ensure `/src/core` remains strictly headless: no direct `console.log` statements, `process.exit()`, or write actions.
 
-## Phase 1 — Project Initialization (COMPLETE)
+## Phase 1 — Project Initialization & Core (COMPLETE)
 
-- [x] Initialize `package.json` with minimal dependencies (manual argv parsing).
+- [x] Initialize `package.json` with minimal dependencies (zero external packages).
 - [x] Configure `tsconfig.json` (NodeNext/ESNext).
-- [x] Create base folder structure (`cli/`, `config/`, `core/`, `parsers/`, `heuristics/`, `reporter/`, `utils/`).
-- [x] Establish CLI entry point (scaffold only).
-- [ ] Verify project can compile with `tsc`.
+- [x] Establish high-speed, zero-dependency streaming file readers in `/src/core/utils/file-io.ts`.
+- [x] Implement robust file size guardrails (500KB cap) to prevent memory allocation spikes.
 
-## Phase 2 — Memory-Safe File Parser Utility (COMPLETE)
+## Phase 2 — Winnow Static Analysis Engine (COMPLETE)
 
-- [x] Implement streaming/chunked file reading (using `readline` + `fs.createReadStream`).
-- [x] Add file size guardrails (500KB).
-- [x] Implement safe regex scanning logic via `scanSourceFile`.
+- [x] Implement core static analysis scheduling engine (`src/core/engine.ts`).
+- [x] Establish extensible Rules Registry model under `src/rules/`.
+- [x] Implement MVP Rules:
+  - `manifest-lifecycle-scripts`: Flags preinstall/postinstall execution vectors.
+  - `source-sensitive-apis`: Pinpoints dynamic evaluation (`eval()`) and system executions (`child_process`).
+- [x] Create Native Test Harness suites (`tests/engine.test.ts`) utilizing mock workspaces.
 
-## Technical Fixes & Refactoring (COMPLETE)
+## Phase 3 — Veil CLI & Subcommands decoupling (COMPLETE)
 
-- [x] Fix TypeScript `node:` prefix resolution.
-- [x] Add stream error handling in `file-io.ts`.
-- [x] Implement Heuristic Registry Pattern.
-- [x] Decouple heuristics from parsers.
+- [x] Create thin CLI wrapper routing shell inputs to subcommands under `src/cli/commands/`:
+  - `scan.ts`: Standard development and production analysis scans.
+  - `explain.ts`: Dynamic rule descriptions and remediation steps fetched programmatically.
+  - `hook.ts`: Standard pre-commit hook runner.
+- [x] Relocate Console Reporter formats to `src/cli/console.ts`.
+- [x] Remove all side-effects and console prints from core scanning routines.
 
-## Phase 3 — Scanning Engine (Core Logic) (COMPLETE)
+## Phase 4 — High-Speed Pre-Commit Hook Decoupling (COMPLETE)
 
-- [x] Implement core scanning engine orchestrator.
-- [x] Integrate heuristics engine.
-- [x] Implement risk scoring model (matches aggregated in findings).
-- [x] Implement MVP Rules: Lifecycle Scripts & Sensitive APIs.
-- [x] Direct dependency targeting (no recursive walk).
+- [x] Move delta checking logic (`src/hooks/delta.ts`) to run scans only when manifest files are staged.
+- [x] Decouple pre-commit orchestration and timeout boundaries (`src/hooks/orchestrator.ts`) using a strict 1.5-second fail-open wrapper.
+- [x] Refactor Husky setup logic (`scripts/setup-hook.ts`) to compile and link the `veil hook` command natively.
 
-## Intermediary Verification (COMPLETE)
+## Phase 5 — WinnowCI GitHub Action (COMPLETE)
 
-- [x] Refine Heuristic Regex (Word boundaries).
-- [x] Enhance match reporting (Line numbers & content).
-- [x] Implement Native Test Harness (`node:test`).
-- [x] Verify orchestrator with mock workspace.
+- [x] Establish the `/ci` directory at the project root.
+- [x] Implement a native composite GitHub Action (`ci/action.yml`) to invoke Veil scan parameters in cloud pipelines.
+- [x] Replace legacy workflows with `.github/workflows/winnow-ci.yml` targeting PR and pushes to `main`.
 
-## Phase 4 — CLI Entry Point (COMPLETE)
+## Phase 6 — Rebranding & Configuration Schema (COMPLETE)
 
-- [x] Implement `scan` and `explain` commands.
-- [x] Output structured risk report (Human-scannable).
-- [x] Ensure clean exit codes for Git hooks (1 for CRITICAL).
-- [x] Manual `process.argv` parsing (Zero dependencies).
+- [x] Rename configuration logic and interfaces to support `veil.json` (`src/config/loader.ts`, `src/config/types.ts`).
+- [x] Rebrand metadata, binary links, and workspace scripts in `package.json` under `veil-cli`.
+- [x] Rebuild whole-repo imports to support `/rules/` namespace structure instead of heuristics.
+- [x] Overwrite documentation with the brand-new systems README.
 
-## Phase 5 — Git Hook Integration (COMPLETE)
+---
 
-- [x] Implement Hook Command Mode (`safedep hook`).
-- [x] Lightweight delta check (Skip if no manifest changes).
-- [x] Strict 1.5s timeout guardrail (Fail-open).
-- [x] Husky integration instructions (`HUSKY.md`).
-- [x] Automated installation script (`scripts/setup-hook.ts`).
-- [x] NPM shortcut (`npm run setup-hook`) for seamless wiring.
+## 🚀 Next Steps & Testing Roadmap
 
-## Hook Diagnostic Sprint (COMPLETE)
+### 1. Stress Testing & Personal Verification (TODO)
+- [ ] **Hook Performance Verification**: Verify pre-commit hooks in active workspaces with multiple staged changes, checking execution is consistently under 25ms.
+- [ ] **Timeout Testing**: Intentionally delay disk I/O to ensure the 1.5s timeout logic triggers fail-open boundaries correctly without locking commit pipelines.
+- [ ] **Workflow Validation**: Deploy the branch PR to verify the composite action `uses: ./ci` runs successfully and flags warnings in headless runners.
 
-- [x] Add explicit lifecycle logs to hook mode.
-- [x] Refine manifest delta matching logic.
-- [x] Improve error reporting for Git failures.
+### 2. Configuration & Allowlist Refinement (TODO)
+- [ ] **Dynamic Allowlist Overrides**: Test loader parsing logic using custom overrides inside local `veil.json` manifests.
+- [ ] **Dynamic Rule Levels**: Implement custom rule severity configurations (WARNING, CRITICAL, INFO) driven by the JSON config.
 
-## Phase 6 — GitHub Actions (CI Enforcement) (COMPLETE)
-
-- [x] Create GitHub Action workflow file (`.github/workflows/safedep.yml`).
-- [x] Configure triggers for `push` and `pull_request` targeting `main`.
-- [x] Set up headless cloud runner (`ubuntu-latest`, Node.js LTS, `npm ci`).
-- [x] Execute full baseline enforcement scan (`scan --include-dev`).
-- [x] Verify non-zero exit codes block broken Pull Requests on GitHub.
-
-## Phase 7 — Real-World Testing & Refinement (TODO)
-
-- [ ] Gather enough testing data from personal use.
-- [ ] Update SafeDep based on the personal testing data.
-
-## Phase 8 — Cohort Readiness & Configuration (TODO)
-
-- [ ] Externalize the Overrides: Move the hardcoded allowlist into a configurable safedep.json file so other developers can trust/bypass their own specific packages.
+### 3. Future Conceptual Expansion: Unveil (TODO)
+- [ ] **Dependency Graph Extraction**: Gather dependency relationship links.
+- [ ] **Interactive Visualizations**: Conceptualize CLI-based trees or HTML-based dependency flow models to uncover hidden lifecycle execution paths.

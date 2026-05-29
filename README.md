@@ -1,100 +1,154 @@
-# SafeDep 🛡️
+# Veil 🛡️
 
-A zero-dependency, ultra-fast static analysis CLI utility designed to intercept supply-chain security risks locally and in the cloud.
+Veil is an ultra-fast, zero-dependency dependency inspection and security CLI. Powered by the **Winnow** static analysis engine, it monitors npm dependencies at install, pre-commit, and CI boundaries to block supply chain attacks in milliseconds.
 
-Unlike traditional tools that only match against pre-existing vulnerability databases (CVEs), **SafeDep actively inspects the structural code patterns of your direct dependencies** in real-time. It detects zero-day risks, malicious lifecycle scripts, and sensitive API usage before the code can ever execute on your machine.
+Unlike vulnerability scanners that query historical CVE databases, Veil parses actual dependency manifests and scans source code streams to intercept zero-day attacks, malicious lifecycle scripts, and code obfuscation patterns before they execute.
 
----
-
-## Why SafeDep?
-
-As a developer, application security shouldn't be an afterthought or a sluggish pipeline bottleneck. Traditional vulnerability databases miss brand-new ("zero-day") threats or custom malicious payloads injected into compromised packages.
-
-SafeDep was built with a **security-first philosophy**:
-
-- **Active Inspection:** It scans the actual source files and manifests of incoming dependencies rather than relying on historical lists.
-- **Developer Experience (DX):** Designed to execute in milliseconds so that security loops enhance workflows rather than slowing them down.
-- **Extensible Architecture:** Built with an isolated registry pattern, allowing developers to customize rules, adjust strictness, and manage codebase-specific allowlists.
-
----
-
-## 📸 Technical Demonstration
-
-### Local Git Hook Gatekeeper Mode
-
-_SafeDep intercepting a high-risk package during a local git commit event in under 15 milliseconds._
-
-![SafeDep Terminal Scan Report](https://via.placeholder.com/800x400.png?text=Placeholder:+SafeDep+Terminal+Scan+Output)
+```
+                  ┌─────────────────────────────────────┐
+                  │              Veil CLI               │
+                  │   (scan / hook / explain / diff)    │
+                  └──────────────────┬──────────────────┘
+                                     │
+                  ┌──────────────────▼──────────────────┐
+                  │            Winnow Engine            │
+                  │       (Static Analysis core)        │
+                  └──────────────────┬──────────────────┘
+                                     │
+             ┌───────────────────────┴───────────────────────┐
+             ▼                                               ▼
+┌─────────────────────────┐                     ┌─────────────────────────┐
+│     Rules Registry      │                     │     WinnowCI Layer      │
+│  (Heuristic Checkers)   │                     │    (GitHub Actions)     │
+└─────────────────────────┘                     └─────────────────────────┘
+```
 
 ---
 
-## 🛠️ The Tech Stack & Architecture
+## Why Veil?
 
-Built purely within the **React & Node.js ecosystem** using strict compilation guardrails:
-
-- **Language:** TypeScript (configured for native `NodeNext` modules).
-- **Runtime Environments:** Node.js LTS, macOS, and Ubuntu Linux (CI).
-- **Testing:** Native Node.js Test Harness (`node:test`) for zero-overhead test suites.
-- **Automation:** Husky (v9+) for local hook interception configuration.
-
-### Performance & Security Guardrails
-
-- **Zero Runtime Dependencies:** Built completely by hand utilizing manual `process.argv` string manipulation to guarantee near-instantaneous CLI boot times.
-- **Memory-Safe Streaming:** Utilizes Node's native `readline` and chunked `fs.createReadStream` to scan files line-by-line, protecting system memory when inspecting heavy dependency footprints.
-- **Targeted Delta Checks:** Leverages standard Git plumbing (`git diff --staged`) to bypass scans entirely if your project manifest hasn't changed.
+1. **Active Analysis vs. Passive Querying**: Traditional audits look for matched version numbers in historical databases. Veil inspects the actual files inside `node_modules` dynamically, detecting modern malicious vectors.
+2. **Sub-20ms Execution Speed**: Written from the ground up with zero external dependencies and manual command parsing. Veil executes local pre-commit gates in milliseconds, keeping development pipelines fast.
+3. **Safe Streaming Architecture**: Uses Node's native `readline` and chunked read streams. Restricts parsing memory footprints and guarantees a maximum file scan threshold (500KB) to prevent resource exhaustion.
+4. **Fail-Safe Gatekeeping**: Local pre-commit hook runs on a 1.5-second hard time cap, falling back open if bounds are exceeded to prevent local blocking, while the cloud CI layer enforces strict verification boundaries.
 
 ---
 
-## 🚀 Features & Implementation
+## Architecture Specification
 
-### 1. Multi-Stage Gatekeeping
+Veil is divided into three distinct modules:
 
-- **Local Protection (`safedep hook`):** A lightweight gatekeeper built into your local Git system. If a dependency change introduces a `CRITICAL` anomaly, the commit is instantly aborted.
-- **Cloud Enforcement (CI):** A GitHub Actions pipeline that clones your code into a headless environment, builds it, and triggers a full baseline scan (`safedep scan --include-dev`) to protect the `main` branch on every Pull Request.
-
-### 2. Heuristics Registry Engine
-
-- **`manifest-lifecycle-scripts`:** Catches risky hooks (e.g., `postinstall` scripts running hidden arbitrary binary executions).
-- **`source-sensitive-apis`:** Pinpoints direct obfuscations or risky runtime calls (e.g., hidden `eval()` configurations or suspicious `child_process` execution modules).
-- **False Positive Management:** Includes an adjustable configuration bypass system to ensure trusted infrastructure packages (like `typescript` or `husky`) don't break developer flow.
+*   **Winnow (Core Engine)**: A headless, pure static analysis library. It has no process exit side-effects, no global logs, and takes input files, streams their contents, and outputs raw structured JSON security scan reports.
+*   **Veil (CLI)**: A lightweight, developer-focused interface wrapper. Parses CLI flags, manages formatting (Console, JSON, SARIF), handles process exit codes, and provides local setup systems.
+*   **WinnowCI (GitHub Action)**: CI validation layer that consumes Winnow results to block high-risk PR merges, emit SARIF reports, and attach inline PR file security reviews.
 
 ---
 
-## 💻 Local Installation & Usage
+## Core Detection Heuristics
 
-### 1. Global Installation (Development Simulation)
+Veil targets supply-chain injection categories using standard structural patterns:
 
-Clone this repository locally, compile the source files, and register the binary link:
-
-<pre><code>npm run build
-npm link</code></pre>
-
-### 2. Wire Up a Project Gatekeeper
-
-Navigate to any target Node.js codebase on your machine and link the engine:
-
-<pre><code>npm link safedep
-npm run setup-hook</code></pre>
-
-### 3. CLI Command Suite
-
-<pre><code># Run a baseline production audit
-npx safedep scan
-
-# Run an exhaustive development audit
-npx safedep scan --include-dev
-
-# Deep dive into rule definitions
-npx safedep explain source-sensitive-apis</code></pre>
+*   **`manifest-lifecycle-scripts` [Severity: WARNING]**: Pinpoints packages using highly suspicious hooks (e.g., `preinstall`, `postinstall`, or `preuninstall`) to execute arbitrary shell scripts or run unverified binaries.
+*   **`source-sensitive-apis` [Severity: CRITICAL]**: Pinpoints high-risk dynamic evaluations (`eval()`) and system-level execution pipelines (`child_process`, `exec`, `spawn`, `fork`) residing in dependency runtime footprints.
 
 ---
 
-## 🗺️ Next Steps & Open Source Vision
+## Configuration
 
-SafeDep is actively being dogfooded and stress-tested across a variety of personal systems and cohort environments.
+Control system behavior globally or locally inside a `veil.json` file placed at your project root:
 
-Before officially publishing to the public **npm registry**, the roadmap includes:
+```json
+{
+  "allowlist": [
+    "husky",
+    "typescript",
+    "@types/node"
+  ],
+  "rules": {
+    "manifest-lifecycle-scripts": {
+      "enabled": true,
+      "severity": "HIGH"
+    },
+    "source-sensitive-apis": {
+      "enabled": true,
+      "severity": "CRITICAL"
+    }
+  }
+}
+```
 
-- [ ] Externalizing configuration profiles into a dedicated local `safedep.json` file.
-- [ ] Refining error isolation loops around complex nested package exports.
-- [ ] Shipping the public NPM package deployment.
+---
+
+## Installation & CLI Usage
+
+### Local CLI Installation
+
+To simulate local CLI development and register the binary link:
+
+```bash
+npm run build
+npm link
+```
+
+### Command Reference
+
+#### 1. Analyze Dependencies
+Scan direct package dependencies against the heuristics engine.
+
+```bash
+# Scan production packages
+veil scan
+
+# Scan production and development packages
+veil scan --include-dev
+```
+
+#### 2. Local Git Hook Protection
+Configure Veil as a high-speed pre-commit git gatekeeper. If the change includes a manifest alteration, Veil executes in under 20ms. If a `CRITICAL` vulnerability is detected, the commit is safely blocked.
+
+```bash
+# Register git commit hook
+veil hook --install
+```
+
+#### 3. Inspect Heuristics
+View detailed technical rationale and security context for a specific detection rule.
+
+```bash
+veil explain source-sensitive-apis
+```
+
+---
+
+## Continuous Integration (WinnowCI)
+
+Integrate WinnowCI directly into your Github Actions workflow file (e.g., `.github/workflows/security.yml`):
+
+```yaml
+name: Dependency Threat Guard
+
+on:
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  verify-dependencies:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Install Dependencies
+        run: npm ci
+
+      - name: Run Winnow Security Scanner
+        uses: winnow-security/winnow-ci@v1
+        with:
+          include-dev: false
+          strict-mode: true
+```
