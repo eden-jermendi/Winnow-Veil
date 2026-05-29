@@ -1,4 +1,4 @@
-export interface SafeDepConfig {
+export interface VeilConfig {
   allowlist?: string[];
   rules?: {
     [ruleId: string]: {

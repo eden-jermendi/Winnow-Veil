@@ -1,4 +1,4 @@
-import { registry } from '../../heuristics/registry.js';
+import { registry } from '../../rules/registry.js';
 
 export function handleExplain(args: string[]) {
   const ruleId = args[0];

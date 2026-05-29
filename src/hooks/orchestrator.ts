@@ -1,6 +1,6 @@
 import { runScanner } from '../core/engine.js';
 import { printConsoleReport } from '../cli/console.js';
-import { HeuristicSeverity } from '../heuristics/types.js';
+import { HeuristicSeverity } from '../rules/types.js';
 import { checkStagedManifestChanges } from './delta.js';
 
 const HOOK_TIMEOUT_MS = 1500;
@@ -9,13 +9,13 @@ export async function runPreCommitHook(): Promise<void> {
   try {
     const hasManifestChanges = checkStagedManifestChanges();
     if (!hasManifestChanges) {
-      console.log('ℹ️  SafeDep: No dependency manifest changes detected. Skipping scan.');
+      console.log('ℹ️  Veil: No dependency manifest changes detected. Skipping scan.');
       process.exit(0);
     }
 
-    console.log('🔍 SafeDep: Staged manifest changes detected. Initializing hook gatekeeper scan...');
+    console.log('🔍 Veil: Staged manifest changes detected. Initializing hook gatekeeper scan...');
   } catch {
-    console.warn('⚠️  SafeDep: Failed to read Git diff status. Defaulting to full scan safety protocol.');
+    console.warn('⚠️  Veil: Failed to read Git diff status. Defaulting to full scan safety protocol.');
   }
 
   const timeoutPromise = new Promise<never>((_, reject) => {
@@ -40,7 +40,7 @@ export async function runPreCommitHook(): Promise<void> {
     );
 
     if (criticalFindings.length > 0) {
-      console.warn('\n⚠️  SafeDep: Critical dependency risks detected in manifest change!');
+      console.warn('\n⚠️  Veil: Critical dependency risks detected in manifest change!');
       printConsoleReport({ ...report, findings: criticalFindings }, duration);
       process.exit(1);
     }
@@ -48,7 +48,7 @@ export async function runPreCommitHook(): Promise<void> {
     process.exit(0);
   } catch (err: any) {
     if (err.message === 'TIMEOUT') {
-      console.warn('\n⚡ SafeDep: Scan timed out (>1.5s). Bypassing to avoid workflow block.');
+      console.warn('\n⚡ Veil: Scan timed out (>1.5s). Bypassing to avoid workflow block.');
     }
     // Fail-open for timeout or internal scanner errors during hook
     process.exit(0);

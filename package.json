@@ -1,11 +1,11 @@
 {
-  "name": "safedep",
+  "name": "veil-cli",
   "version": "0.1.0",
   "type": "module",
   "description": "Lightweight dependency risk scanner",
   "main": "dist/src/index.js",
   "bin": {
-    "safedep": "dist/src/cli/index.js"
+    "veil": "dist/src/cli/index.js"
   },
   "scripts": {
     "build": "tsc && chmod +x dist/src/cli/index.js",

@@ -3,7 +3,7 @@ import assert from 'node:assert';
 import path from 'node:path';
 import fs from 'node:fs';
 import { runScanner } from '../src/core/engine.js';
-import { HeuristicSeverity } from '../src/heuristics/types.js';
+import { HeuristicSeverity } from '../src/rules/types.js';
 
 test('Scanning Engine Verification', async (t) => {
   const tmpDir = path.join(process.cwd(), 'tmp-test-workspace');

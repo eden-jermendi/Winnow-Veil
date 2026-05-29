@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 /**
- * SafeDep CLI Entry Point
+ * Veil CLI Entry Point
  * Manual argv parsing to keep dependencies to an absolute minimum.
  */
 
@@ -36,10 +36,10 @@ async function main() {
 
 function printHelp() {
   console.log(`
-SafeDep - Lightweight dependency risk scanner
+Veil - Lightweight dependency risk scanner
 
 Usage:
-  safedep <command> [options]
+  veil <command> [options]
 
 Commands:
   scan               Analyze dependencies for lifecycle script risks and malicious patterns

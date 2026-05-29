@@ -1,6 +1,6 @@
 import { runScanner } from '../../core/engine.js';
 import { printConsoleReport } from '../console.js';
-import { HeuristicSeverity } from '../../heuristics/types.js';
+import { HeuristicSeverity } from '../../rules/types.js';
 
 export async function handleScan(options: string[]) {
   const includeDevDeps = options.includes('--include-dev');

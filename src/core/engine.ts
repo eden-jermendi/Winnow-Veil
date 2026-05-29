@@ -2,8 +2,8 @@ import path from 'node:path';
 import fs from 'node:fs/promises';
 import { parsePackageManifest } from './parsers/package.js';
 import { scanSourceFile } from './parsers/source.js';
-import { registry } from '../heuristics/registry.js';
-import { HeuristicMatch } from '../heuristics/types.js';
+import { registry } from '../rules/registry.js';
+import { HeuristicMatch } from '../rules/types.js';
 import { loadConfig } from '../config/loader.js';
 
 export interface ScanOptions {
