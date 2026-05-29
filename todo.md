@@ -65,3 +65,9 @@
 ### 3. Future Conceptual Expansion: Unveil (TODO)
 - [ ] **Dependency Graph Extraction**: Gather dependency relationship links.
 - [ ] **Interactive Visualizations**: Conceptualize CLI-based trees or HTML-based dependency flow models to uncover hidden lifecycle execution paths.
+
+### 4. Secure npm Trusted Publishing (OIDC) (HIGH PRIORITY - TODO)
+- [ ] **Revoke Bypass Token**: Delete the temporary granular token from npm and remove `NPM_TOKEN` from GitHub secrets (achieving maximum security).
+- [ ] **Configure Trusted Publisher**: Bind `winnow-veil` to `eden-jermendi/Winnow-Veil` on npm via **Account Settings** -> **Publishing** -> **Trusted Publishing**.
+- [ ] **Deploy OIDC Workflow**: Update `.github/workflows/npm-publish.yml` to request OIDC `id-token` write permissions and publish using `npm publish --provenance --access public`.
+

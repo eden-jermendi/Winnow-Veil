@@ -4,6 +4,10 @@ on:
   release:
     types: [published]
 
+permissions:
+  id-token: write # Required to request the OIDC token from npm
+  contents: read  # Required to checkout code
+
 jobs:
   publish:
     runs-on: ubuntu-latest
@@ -27,6 +31,4 @@ jobs:
         run: npm run build
 
       - name: Register Package on npm Registry
-        run: npm publish --access public
-        env:
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+        run: npm publish --provenance --access public
