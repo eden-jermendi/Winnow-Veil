@@ -1,0 +1,26 @@
+name: 'WinnowCI'
+description: 'High-performance dependency security inspector powered by the Winnow engine'
+inputs:
+  include-dev:
+    description: 'Include devDependencies in the verification scan'
+    required: false
+    default: 'false'
+runs:
+  using: 'composite'
+  steps:
+    - name: Verify Build Status
+      shell: bash
+      run: |
+        if [ ! -d "dist" ]; then
+          echo "⚡ Building Veil CLI from source..."
+          npm run build
+        fi
+
+    - name: Execute Winnow Engine via Veil CLI
+      shell: bash
+      run: |
+        FLAGS=""
+        if [ "${{ inputs.include-dev }}" == "true" ]; then
+          FLAGS="--include-dev"
+        fi
+        node dist/src/cli/index.js scan $FLAGS
