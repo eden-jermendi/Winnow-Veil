@@ -15,7 +15,6 @@ export function loadConfig(projectRoot: string): SafeDepConfig {
     const content = fs.readFileSync(configPath, 'utf-8');
     return JSON.parse(content) as SafeDepConfig;
   } catch (error) {
-    console.error(`[SafeDep] Error: Failed to parse ${CONFIG_FILE}. Ensure it is valid JSON.`);
-    process.exit(1);
+    throw new Error(`Failed to parse ${CONFIG_FILE}. Ensure it is valid JSON.`);
   }
 }

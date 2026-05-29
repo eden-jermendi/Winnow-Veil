@@ -1,5 +1,5 @@
 import { scanFileLines } from '../utils/file-io.js';
-import { HeuristicRule, HeuristicMatch } from '../heuristics/types.js';
+import { HeuristicRule, HeuristicMatch } from '../../heuristics/types.js';
 
 /**
  * Scans a source file for patterns using streaming.
