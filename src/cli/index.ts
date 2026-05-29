@@ -4,13 +4,9 @@
  * Manual argv parsing to keep dependencies to an absolute minimum.
  */
 
-import { runScanner } from '../core/engine.js'
-import { printConsoleReport } from './console.js'
-import { HeuristicSeverity } from '../heuristics/types.js'
-import { execSync } from 'node:child_process'
-import path from 'node:path'
-import { handleScan } from './commands/scan.js'
-import { handleExplain } from './commands/explain.js'
+import { handleScan } from './commands/scan.js';
+import { handleExplain } from './commands/explain.js';
+import { handleHook } from './commands/hook.js';
 
 async function main() {
   const args = process.argv.slice(2)
@@ -57,83 +53,6 @@ Options:
 }
 
 
-async function handleHook() {
-  // 1. Delta Check: Check if manifests changed in staged changes
-  try {
-    const stagedFiles = execSync('git diff --staged --name-only', {
-      encoding: 'utf-8',
-    })
-    const manifests = [
-      'package.json',
-      'package-lock.json',
-      'yarn.lock',
-      'pnpm-lock.yaml',
-    ]
-
-    const hasManifestChanges = stagedFiles.split('\n').some((file) => {
-      const fileName = path.basename(file.trim())
-      return manifests.includes(fileName)
-    })
-
-    if (!hasManifestChanges) {
-      console.log(
-        'ℹ️  SafeDep: No dependency manifest changes detected. Skipping scan.',
-      )
-      process.exit(0)
-    }
-
-    console.log(
-      '🔍 SafeDep: Staged manifest changes detected. Initializing hook gatekeeper scan...',
-    )
-  } catch (err) {
-    console.warn(
-      '⚠️  SafeDep: Failed to read Git diff status. Defaulting to full scan safety protocol.',
-    )
-  }
-
-  // 2. Timeout Guardrail: 1.5s limit
-  const HOOK_TIMEOUT_MS = 1500
-
-  const timeoutPromise = new Promise((_, reject) => {
-    setTimeout(() => reject(new Error('TIMEOUT')), HOOK_TIMEOUT_MS)
-  })
-
-  const scanPromise = (async () => {
-    const startTime = performance.now()
-    const report = await runScanner(process.cwd(), { includeDevDeps: false })
-    const endTime = performance.now()
-    return { report, duration: endTime - startTime }
-  })()
-
-  try {
-    const { report, duration } = (await Promise.race([
-      scanPromise,
-      timeoutPromise,
-    ])) as { report: any; duration: number }
-
-    const criticalFindings = report.findings.filter((f: any) =>
-      f.matches.some((m: any) => m.severity === HeuristicSeverity.CRITICAL),
-    )
-
-    if (criticalFindings.length > 0) {
-      console.warn(
-        '\n⚠️  SafeDep: Critical dependency risks detected in manifest change!',
-      )
-      printConsoleReport({ ...report, findings: criticalFindings }, duration)
-      process.exit(1)
-    }
-
-    process.exit(0)
-  } catch (err: any) {
-    if (err.message === 'TIMEOUT') {
-      console.warn(
-        '\n⚡ SafeDep: Scan timed out (>1.5s). Bypassing to avoid workflow block.',
-      )
-    }
-    // Fail-open for timeout or internal scanner errors during hook
-    process.exit(0)
-  }
-}
 
 
 main().catch((err) => {
